@@ -4,7 +4,7 @@
 ### 1. Clone this repository
 Using this command: 
 ```bash
- git clone git@github.com:Kepalez/BankUP.git
+ git clone https://github.com/Kepalez/BankUP.git
 ```
 On a safe folder
 ### 2. Install all dependencies
