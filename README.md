@@ -21,3 +21,4 @@ or
 ```bash
  npm run web
 ```
+This should get the server running on localhost:8081
