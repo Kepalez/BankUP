@@ -40,6 +40,13 @@ Using this command:
 ```bash
  npm install
 ```
+Also install the dependencies on the server folder
+```bash
+cd server
+```
+```bash
+ npm install
+```
 
 #### Run the server
 After installing all dependencies now you can run:
