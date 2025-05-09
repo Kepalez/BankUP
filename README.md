@@ -12,3 +12,12 @@ Using this command:
 ```bash
  npm install
 ```
+### 3. Run the server
+After installing all dependencies now you can run:
+```bash
+ npm run start
+```
+or 
+```bash
+ npm run web
+```

@@ -1,17 +1,12 @@
 import React, { useState } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
 import styles from '../styles';
 import { 
-  StyleSheet, 
   Text, 
   View, 
   TextInput, 
   TouchableOpacity, 
   SafeAreaView, 
-  FlatList, 
   Alert, 
-  StatusBar 
 } from 'react-native';
 
 interface Transfer {
