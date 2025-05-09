@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import styles from "./styles";
 import { 
   StyleSheet, 
   Text, 
@@ -12,21 +13,7 @@ import {
   Alert, 
   StatusBar 
 } from 'react-native';
-
-interface User {
-  username: string;
-  password: string;
-  accountNumber: string;
-  balance: number;
-  transfers: Transfer[];
-}
-
-interface Transfer {
-  id: string;
-  amount: number;
-  destination: string;
-  date: string;
-}
+import LoginPage from './pages/LoginPage';
 
 type RootStackParamList = {
   Login: undefined;
@@ -35,20 +22,20 @@ type RootStackParamList = {
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
+interface Transfer {
+  id: string;
+  amount: number;
+  destination: string;
+  date: string;
+}
 
-const COLORS = {
-  primary: '#0066CC',    
-  secondary: '#00A3E0',   
-  accent: '#FFD100',      
-  background: '#F9FBFC',  
-  text: '#333333',        
-  textLight: '#666666',   
-  border: '#E1E1E1',     
-  success: '#4CAF50',     
-  error: '#F44336',       
-  white: '#FFFFFF',       
-};
-
+interface User {
+  username: string;
+  password: string;
+  accountNumber: string;
+  balance: number;
+  transfers: Transfer[];
+}
 const MOCK_USER: User = {
   username: 'usuario',
   password: '12345', 
@@ -92,63 +79,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({ title, onPress, type = 'pri
 interface ScreenProps {
   navigation: any;
 }
-const LoginScreen: React.FC<ScreenProps> = ({ navigation }) => {
-  const [username, setUsername] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const [error, setError] = useState<string>('');
 
-  const handleLogin = (): void => {
-    if (username === MOCK_USER.username && password === MOCK_USER.password) {
-      navigation.navigate('Home');
-    } else {
-      setError('Usuario o contraseña incorrectos');
-    }
-  };
-
-  return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar backgroundColor={COLORS.primary} />
-      <View style={styles.loginContainer}>
-        <View style={styles.logoContainer}>
-          <View style={styles.logoPlaceholder}>
-            <Text style={styles.logoText}>BANCO</Text>
-          </View>
-        </View>
-        
-        <Text style={styles.title}>Bienvenido</Text>
-        
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>Usuario</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Ingrese su usuario"
-            value={username}
-            onChangeText={setUsername}
-          />
-        </View>
-        
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>Contraseña</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Ingrese su contraseña"
-            secureTextEntry={true}
-            value={password}
-            onChangeText={setPassword}
-          />
-        </View>
-        
-        {error ? <Text style={styles.errorText}>{error}</Text> : null}
-        
-        <CustomButton title="Iniciar Sesión" onPress={handleLogin} />
-        
-        <TouchableOpacity style={styles.forgotPasswordContainer}>
-          <Text style={styles.forgotPasswordText}>¿Olvidaste tu contraseña?</Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
-  );
-};
 const HomeScreen: React.FC<ScreenProps> = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
@@ -316,7 +247,7 @@ const App: React.FC = () => {
       <Stack.Navigator initialRouteName="Login" screenOptions={{
         headerShown: false
       }}>
-        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="Login" component={LoginPage}/>
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="Transfer" component={TransferScreen} />
       </Stack.Navigator>
@@ -324,213 +255,5 @@ const App: React.FC = () => {
   );
 };
 
-// Estilos
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  // Estilos de Login
-  loginContainer: {
-    flex: 1,
-    padding: 20,
-    justifyContent: 'center',
-  },
-  logoContainer: {
-    alignItems: 'center',
-    marginBottom: 40,
-  },
-  logoPlaceholder: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: COLORS.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  logoText: {
-    color: COLORS.white,
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: COLORS.text,
-    marginBottom: 30,
-    textAlign: 'center',
-  },
-  inputContainer: {
-    marginBottom: 20,
-  },
-  inputLabel: {
-    fontSize: 16,
-    marginBottom: 8,
-    color: COLORS.text,
-  },
-  input: {
-    backgroundColor: COLORS.white,
-    borderRadius: 8,
-    padding: 15,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    fontSize: 16,
-  },
-  forgotPasswordContainer: {
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  forgotPasswordText: {
-    color: COLORS.secondary,
-    fontSize: 16,
-  },
-  errorText: {
-    color: COLORS.error,
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  
-  // Estilos para botones
-  button: {
-    borderRadius: 8,
-    padding: 15,
-    alignItems: 'center',
-    marginVertical: 10,
-  },
-  buttonPrimary: {
-    backgroundColor: COLORS.primary,
-  },
-  buttonSecondary: {
-    backgroundColor: COLORS.white,
-    borderWidth: 1,
-    borderColor: COLORS.primary,
-  },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  buttonTextPrimary: {
-    color: COLORS.white,
-  },
-  buttonTextSecondary: {
-    color: COLORS.primary,
-  },
-  
-  // Estilos de la pantalla Home
-  header: {
-    backgroundColor: COLORS.primary,
-    padding: 20,
-    paddingTop: 40,
-  },
-  headerTitle: {
-    color: COLORS.white,
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  balanceCard: {
-    backgroundColor: COLORS.white,
-    margin: 15,
-    padding: 20,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  balanceLabel: {
-    fontSize: 16,
-    color: COLORS.textLight,
-    marginBottom: 5,
-  },
-  balanceAmount: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: COLORS.text,
-    marginBottom: 5,
-  },
-  accountNumber: {
-    fontSize: 14,
-    color: COLORS.textLight,
-  },
-  actionsContainer: {
-    paddingHorizontal: 15,
-    marginBottom: 15,
-  },
-  transactionsContainer: {
-    flex: 1,
-    backgroundColor: COLORS.white,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    padding: 20,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: COLORS.text,
-    marginBottom: 15,
-  },
-  transactionItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
-  },
-  transactionDetails: {
-    flex: 1,
-  },
-  transactionAccount: {
-    fontSize: 16,
-    color: COLORS.text,
-    marginBottom: 5,
-  },
-  transactionDate: {
-    fontSize: 14,
-    color: COLORS.textLight,
-  },
-  transactionAmount: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: COLORS.error,
-  },
-  emptyListText: {
-    textAlign: 'center',
-    color: COLORS.textLight,
-    marginTop: 20,
-  },
-  
-  // Estilos de la pantalla de transferencia
-  transferContainer: {
-    flex: 1,
-    padding: 20,
-  },
-  balanceInfoContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: COLORS.white,
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  balanceInfoLabel: {
-    fontSize: 16,
-    color: COLORS.textLight,
-  },
-  balanceInfoValue: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: COLORS.text,
-  },
-  transferButtonContainer: {
-    marginTop: 20,
-  },
-});
 
 export default App;
