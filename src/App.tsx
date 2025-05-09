@@ -3,7 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import LoginPage from './pages/LoginPage';
 import HomeScreen from './pages/HomePage';
-import TransferScreen from './pages/TransfarePage';
+import TransferScreen from './pages/TransferPage';
 
 type RootStackParamList = {
   Login: undefined;
@@ -13,7 +13,6 @@ type RootStackParamList = {
 
 const Stack = createStackNavigator<RootStackParamList>();
 
-// Componente principal de la aplicación
 const App: React.FC = () => {
   return (
     <NavigationContainer>
@@ -27,6 +26,4 @@ const App: React.FC = () => {
     </NavigationContainer>
   );
 };
-
-
 export default App;

@@ -86,7 +86,7 @@ const LoginScreen = (props: ScreenProps) => {
       <View style={styles.loginContainer}>
         <View style={styles.logoContainer}>
           <View style={styles.logoPlaceholder}>
-            <Text style={styles.logoText}>BANCO</Text>
+            <Text style={styles.logoText}>UPBANK</Text>
           </View>
         </View>
         
