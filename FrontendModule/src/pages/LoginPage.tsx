@@ -9,6 +9,8 @@ import {
   StatusBar 
 } from 'react-native';
 
+var contador = 1;
+
 interface ScreenProps {
   navigation: any;
 }
@@ -27,19 +29,6 @@ interface User {
   balance: number;
   transfers: Transfer[];
 }
-
-const MOCK_USER: User = {
-  username: 'usuario',
-  password: '12345', 
-  accountNumber: '12345678',
-  balance: 5000,
-  transfers: [
-    { id: '1', amount: 200, destination: '87654321', date: '2025-05-01' },
-    { id: '2', amount: 150, destination: '87654321', date: '2025-05-03' },
-    { id: '3', amount: 300, destination: '11223344', date: '2025-05-05' },
-  ]
-};
-
 
 interface CustomButtonProps {
   title: string;
@@ -71,12 +60,31 @@ const LoginScreen = (props: ScreenProps) => {
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
+  const [attemptsLeft, setAttemptsLeft] = useState<number | null>(null);
 
-  const handleLogin = (): void => {
-    if (username === MOCK_USER.username && password === MOCK_USER.password) {
-      props.navigation.navigate('Home');
-    } else {
-      setError('Usuario o contraseña incorrectos');
+  const handleLogin = async (): Promise<void> => {
+    try {
+      const response = await fetch('http://localhost:5000/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        props.navigation.navigate('Home', { userId: data.userId });
+      } else {
+        if (data.attemptsLeft !== undefined) {
+          setAttemptsLeft(data.attemptsLeft);
+          setError(`${data.error} (Intentos restantes: ${data.attemptsLeft})`);
+        } else {
+          setError(data.error || 'Error al iniciar sesión');
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      setError('No se pudo conectar con el servidor');
     }
   };
 

@@ -28,6 +28,75 @@ app.get('/api/clients', async (req, res) => {
   }
 });
 
+app.post('/api/login', async (req, res) => {
+  const { username, password } = req.body;
+  try {
+    // Buscar el usuario en la base de datos
+    const userQuery = await pool.query(
+      `SELECT app_user.*, user_status.status_name 
+       FROM app_user 
+       JOIN user_status ON app_user.user_status_id = user_status.id
+       WHERE username = $1`,
+      [username]
+    );
+
+    if (userQuery.rows.length === 0) {
+      return res.status(401).json({ error: 'Usuario no encontrado' });
+    }
+
+    const user = userQuery.rows[0];
+
+
+    if (user.status_name === 'blocked') {
+      return res.status(403).json({ error: 'Cuenta bloqueada. Contacte al administrador.' });
+    }
+
+
+    const passwordMatch = password === user.password;
+
+    if (!passwordMatch) {
+      const failedAttempts = user.failed_attempts ? user.failed_attempts + 1 : 1;
+      
+      if (failedAttempts >= 3) {
+        await pool.query(
+          'UPDATE app_user SET user_status_id = (SELECT id FROM user_status WHERE status_name = $1), failed_attempts = $2 WHERE id = $3',
+          ['blocked', failedAttempts, user.id]
+        );
+        return res.status(403).json({ error: 'Demasiados intentos fallidos. Cuenta bloqueada.' });
+      } else {
+        // Actualizar solo el contador de intentos fallidos
+        await pool.query(
+          'UPDATE app_user SET failed_attempts = $1 WHERE id = $2',
+          [failedAttempts, user.id]
+        );
+        return res.status(401).json({ 
+          error: 'Contraseña incorrecta', 
+          attemptsLeft: 3 - failedAttempts 
+        });
+      }
+    }
+
+    await pool.query(
+      'UPDATE app_user SET failed_attempts = 0 WHERE id = $1',
+      [user.id]
+    );
+
+    const userData = {
+      userId: user.id,
+      username: user.username,
+      roleId: user.role_id,
+      clientId: user.client_id,
+      status: user.status_name
+    };
+
+    res.json(userData);
+
+  } catch (error) {
+    console.error('Error en login:', error);
+    res.status(500).json({ error: 'Error en el servidor' });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Servidor corriendo en http://localhost:${port}`);
 });
