@@ -4,9 +4,11 @@ import { createStackNavigator } from '@react-navigation/stack';
 import LoginPage from './pages/LoginPage';
 import HomeScreen from './pages/HomePage';
 import TransferScreen from './pages/TransferPage';
+import AdminPage from './pages/AdminPage';
 
 type RootStackParamList = {
   Login: undefined;
+  AdminHome: undefined;
   Home: undefined;
   Transfer: undefined;
 };
@@ -20,6 +22,7 @@ const App: React.FC = () => {
         headerShown: false
       }}>
         <Stack.Screen name="Login" component={LoginPage}/>
+        <Stack.Screen name="AdminHome" component={AdminPage}/>
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="Transfer" component={TransferScreen} />
       </Stack.Navigator>
