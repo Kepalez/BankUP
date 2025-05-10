@@ -33,6 +33,7 @@ CREATE TABLE app_user (
     user_status_id int NOT NULL,
     username VARCHAR(16) NOT NULL,
     password VARCHAR(8) NOT NULL,
+    failed_attempts INT DEFAULT 0,
     CONSTRAINT fk_client FOREIGN KEY (client_id)
     REFERENCES client(id),
     CONSTRAINT fk_role FOREIGN KEY (role_id)
