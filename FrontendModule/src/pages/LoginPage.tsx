@@ -74,7 +74,7 @@ const LoginScreen = (props: ScreenProps) => {
 
   const handleLogin = (): void => {
     if (username === MOCK_USER.username && password === MOCK_USER.password) {
-      props.navigation.navigate('Home');
+      props.navigation.navigate('Home',{userID:1});
     } else {
       setError('Usuario o contraseña incorrectos');
     }

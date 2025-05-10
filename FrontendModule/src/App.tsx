@@ -7,11 +7,11 @@ import TransferScreen from './pages/TransferPage';
 
 type RootStackParamList = {
   Login: undefined;
-  Home: undefined;
+  Home: {userID: number | null};
   Transfer: undefined;
 };
 
-const Stack = createStackNavigator<RootStackParamList>();
+const Stack  = createStackNavigator<RootStackParamList>();
 
 const App: React.FC = () => {
   return (
@@ -20,7 +20,7 @@ const App: React.FC = () => {
         headerShown: false
       }}>
         <Stack.Screen name="Login" component={LoginPage}/>
-        <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="Home" component={HomeScreen} initialParams={{userID:null}}/>
         <Stack.Screen name="Transfer" component={TransferScreen} />
       </Stack.Navigator>
     </NavigationContainer>
