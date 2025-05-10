@@ -17,6 +17,22 @@ const pool = new Pool({
   port: 5432,
 });
 
+// Ruta para obtener un cliente por ID
+app.get('/api/clients/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query('SELECT * FROM client WHERE id = $1', [id]);
+    if (result.rows.length > 0) {
+      res.json(result.rows[0]);
+    } else {
+      res.status(404).json({ message: 'Cliente no encontrado' });
+    }
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Error en el servidor');
+  }
+});
+
 // Ruta para obtener clientes
 app.get('/api/clients', async (req, res) => {
   try {
