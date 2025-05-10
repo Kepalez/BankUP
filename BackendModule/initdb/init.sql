@@ -80,8 +80,7 @@ INSERT INTO client (first_name, last_name, curp, rfc, phone, email) VALUES
 
 INSERT INTO role (role_name) VALUES
 ('admin'),
-('user'),
-('auditor');
+('user')
 
 INSERT INTO user_status (status_name) VALUES
 ('active'),
@@ -96,7 +95,7 @@ INSERT INTO account_status (status_name) VALUES
 INSERT INTO app_user (client_id, role_id, user_status_id, username, password) VALUES
 (1, 1, 1, 'ana_admin', 'pass1234'),
 (2, 2, 1, 'luis_user', 'word5678'),
-(3, 3, 3, 'carla_audit', 'audit999');
+(3, 2, 3, 'carla_audit', 'audit999');
 
 INSERT INTO account (client_id, account_number, clabe, balance, aperture_date, account_status_id) VALUES
 (1, 'ACC000001', '646180123456789001', 15000.00, '2023-01-10', 1),
