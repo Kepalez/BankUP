@@ -97,6 +97,26 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
+app.get('/api/user/:id/balance', async (req, res) => {
+  try {
+    const result = await pool.query(`SELECT account.balance FROM account JOIN client ON account.client_id = client.id JOIN app_user ON app_user.client_id = client.id WHERE app_user.id = ${req.params.id}`);
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Error en el servidor');
+  }
+});
+
+app.get('/api/user/:id/transferences', async (req, res) => {
+  try {
+    const result = await pool.query(`SELECT transfer.source_account_id, transfer.destination_account_id, transfer.transfer_date, transfer.amount, transfer.concept FROM account JOIN client ON account.client_id = client.id JOIN app_user ON app_user.client_id = client.id JOIN transfer on transfer.source_account_id = account.id or transfer.destination_account_id = account.id WHERE app_user.id = ${req.params.id}`);
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Error en el servidor');
+  }
+});
+
 app.listen(port, () => {
   console.log(`Servidor corriendo en http://localhost:${port}`);
 });
