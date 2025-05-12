@@ -66,7 +66,6 @@ const LoginScreen = (props: ScreenProps) => {
         
       } else {
         if (data.attemptsLeft !== undefined) {
-          setAttemptsLeft(data.attemptsLeft);
           setError(`${data.error} (Intentos restantes: ${data.attemptsLeft})`);
         } else {
           setError(data.error || 'Error al iniciar sesión');

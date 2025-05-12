@@ -178,10 +178,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: COLORS.textLight,
   },
-  transactionAmount: {
+  transactionAmountNegative: {
     fontSize: 16,
     fontWeight: 'bold',
     color: COLORS.error,
+  },
+  transactionAmountPositive: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: COLORS.success,
   },
   emptyListText: {
     textAlign: 'center',

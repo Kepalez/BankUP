@@ -15,12 +15,13 @@ interface Transfer {
   amount: string;
   concept: string;
   destination_client_name:string;
+  source_client_name: string;
   transfer_date: Date;
 }
 
 type RootStackParamList = {
   Login: undefined;
-  Home: {userID: number | null};
+  Home: {userId: number | null};
   Transfer: undefined;
 };
 
@@ -63,15 +64,23 @@ const CustomButton: React.FC<CustomButtonProps> = ({ title, onPress, type = 'pri
 
 const HomeScreen: React.FC<Props> = ( {route, navigation} ) => {
   const [client, setClient] = useState<User>();
+  const [clientName, setClientName] = useState<string>("no nombre de usuario");
   const [clientBalance, setClientBalance] = useState<number>(0);
   const [clientTransferences, setClientTransferences] = useState<Transfer[]>([]);
-  const { userID } = route.params;
+  const { userId } = route.params;
 
   useEffect(()=>{
+    console.log("User ID: ",userId);
     fetchClient();
     fetchBalance();
     fetchTransferences();
-  },[userID]);
+  },[userId]);
+
+  useEffect(()=>{
+    if(client){
+      setClientName(client.first_name+" "+client.last_name);
+    }
+  },[client]);
 
   useEffect(()=>{
     console.log(clientBalance);
@@ -79,7 +88,7 @@ const HomeScreen: React.FC<Props> = ( {route, navigation} ) => {
 
   const fetchClient = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/clients/${userID}`);
+      const response = await fetch(`http://localhost:5000/api/clients/${userId}`);
       if (!response.ok) {
         throw new Error('Cliente no encontrado');
       }
@@ -92,7 +101,7 @@ const HomeScreen: React.FC<Props> = ( {route, navigation} ) => {
 
   const fetchBalance = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/user/${userID}/balance`);
+      const response = await fetch(`http://localhost:5000/api/user/${userId}/balance`);
       if (!response.ok) {
         throw new Error('Cliente no encontrado');
       }
@@ -105,7 +114,7 @@ const HomeScreen: React.FC<Props> = ( {route, navigation} ) => {
 
   const fetchTransferences = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/user/${userID}/transferences`);
+      const response = await fetch(`http://localhost:5000/api/user/${userId}/transferences`);
       if (!response.ok) {
         throw new Error('Cliente no encontrado');
       }
@@ -145,10 +154,16 @@ const HomeScreen: React.FC<Props> = ( {route, navigation} ) => {
           renderItem={({ item }) => (
             <View style={styles.transactionItem}>
               <View style={styles.transactionDetails}>
+                <div className='flex flex-row gap-x-4'>
                 <Text style={styles.transactionAccount}>Destinatario: {item.destination_client_name}</Text>
+                <Text style={styles.transactionAccount}>Receptor: {item.source_client_name}</Text>
+                </div>
+                <Text style={styles.transactionAccount}>Concepto: {item.concept}</Text>
                 <Text style={styles.transactionDate}>{item.transfer_date.toString().split("T")[0]}</Text>
               </View>
-              <Text style={styles.transactionAmount}>- ${item.amount}</Text>
+              {item.destination_client_name == clientName ? 
+              (<Text style={styles.transactionAmountPositive}>+ ${item.amount}</Text>):
+              (<Text style={styles.transactionAmountNegative}>- ${item.amount}</Text>)}
             </View>
           )}
           ListEmptyComponent={
