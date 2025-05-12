@@ -71,9 +71,8 @@ const LoginScreen = (props: ScreenProps) => {
       });
 
       const data = await response.json();
-
       if (response.ok) {
-        props.navigation.navigate('Home', { userId: data.userId });
+        props.navigation.navigate('Home', { userID: data.userId });
       } else {
         if (data.attemptsLeft !== undefined) {
           setAttemptsLeft(data.attemptsLeft);

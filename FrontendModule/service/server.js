@@ -125,7 +125,54 @@ app.get('/api/user/:id/balance', async (req, res) => {
 
 app.get('/api/user/:id/transferences', async (req, res) => {
   try {
-    const result = await pool.query(`SELECT transfer.source_account_id, transfer.destination_account_id, transfer.transfer_date, transfer.amount, transfer.concept FROM account JOIN client ON account.client_id = client.id JOIN app_user ON app_user.client_id = client.id JOIN transfer on transfer.source_account_id = account.id or transfer.destination_account_id = account.id WHERE app_user.id = ${req.params.id}`);
+    const result = await pool.query(
+      `SELECT
+          transfer.source_client_name,
+          transfer.destination_client_name,
+          transfer.transfer_date,
+          transfer.amount,
+          transfer.concept
+      FROM (
+          SELECT
+              transfer.id,
+              transfer.transfer_date,
+              transfer.amount,
+              transfer.concept,
+              source_account.client_id as source_client_id,
+              source_account.client_name as source_client_name,
+              destination_account.client_id as destination_client_id,
+              destination_account.client_name as destination_client_name
+          FROM transfer
+          JOIN
+          (
+              SELECT
+                  transfer.id as transfer_id,
+                  client.id as client_id,
+                  client.first_name || ' ' || client.last_name as client_name
+              FROM transfer
+              JOIN account
+                  ON transfer.source_account_id = account.id
+              JOIN client
+                  ON account.client_id = client.id
+          ) source_account
+              ON source_account.transfer_id = transfer.id
+          JOIN (
+              SELECT
+                  transfer.id as transfer_id,
+                  client.id as client_id,
+                  client.first_name || ' ' || client.last_name as client_name
+              FROM transfer
+              JOIN account
+                  ON transfer.destination_account_id = account.id
+              JOIN client
+                  ON account.client_id = client.id
+          ) destination_account
+              ON destination_account.transfer_id = transfer.id
+      ) transfer
+      JOIN app_user
+          ON app_user.client_id = transfer.source_client_id OR app_user.client_id = transfer.destination_client_id
+      WHERE app_user.id = ${req.params.id}`
+    );
     res.json(result.rows);
   } catch (err) {
     console.error(err.message);

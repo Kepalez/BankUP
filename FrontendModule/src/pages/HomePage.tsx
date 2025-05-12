@@ -12,9 +12,10 @@ import {
 
 interface Transfer {
   id: string;
-  amount: number;
-  destination: string;
-  date: string;
+  amount: string;
+  concept: string;
+  destination_client_name:string;
+  transfer_date: Date;
 }
 
 type RootStackParamList = {
@@ -62,15 +63,19 @@ const CustomButton: React.FC<CustomButtonProps> = ({ title, onPress, type = 'pri
 
 const HomeScreen: React.FC<Props> = ( {route, navigation} ) => {
   const [client, setClient] = useState<User>();
-  const { userID } = route.params; // 👈 Aquí accedes correctamente al parámetro
+  const [clientBalance, setClientBalance] = useState<number>(0);
+  const [clientTransferences, setClientTransferences] = useState<Transfer[]>([]);
+  const { userID } = route.params;
 
   useEffect(()=>{
     fetchClient();
+    fetchBalance();
+    fetchTransferences();
   },[userID]);
 
   useEffect(()=>{
-    console.log(client);
-  },[client]);
+    console.log(clientBalance);
+  },[clientBalance]);
 
   const fetchClient = async () => {
     try {
@@ -85,6 +90,33 @@ const HomeScreen: React.FC<Props> = ( {route, navigation} ) => {
     }
   };
 
+  const fetchBalance = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/user/${userID}/balance`);
+      if (!response.ok) {
+        throw new Error('Cliente no encontrado');
+      }
+      const data = await response.json();
+      setClientBalance(data[0].balance);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const fetchTransferences = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/user/${userID}/transferences`);
+      if (!response.ok) {
+        throw new Error('Cliente no encontrado');
+      }
+      const data = await response.json();
+      console.log("Transferences: ",data);
+      setClientTransferences(data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -93,8 +125,8 @@ const HomeScreen: React.FC<Props> = ( {route, navigation} ) => {
       
       <View style={styles.balanceCard}>
         <Text style={styles.balanceLabel}>Saldo Disponible</Text>
-        <Text style={styles.balanceAmount}>${1000000}</Text>
-        <Text style={styles.accountNumber}>Cuenta: {client ? client.first_name+client.last_name : "Undefined"}</Text>
+        <Text style={styles.balanceAmount}>${clientBalance ?? "noaaaah"}</Text>
+        <Text style={styles.accountNumber}>Cuenta: {client ? client.first_name+" "+client.last_name : "Undefined"}</Text>
       </View>
       
       <View style={styles.actionsContainer}>
@@ -108,17 +140,13 @@ const HomeScreen: React.FC<Props> = ( {route, navigation} ) => {
         <Text style={styles.sectionTitle}>Historial de Transferencias</Text>
         
         <FlatList
-          data={[
-            { id: '1', amount: 200, destination: '87654321', date: '2025-05-01' },
-            { id: '2', amount: 150, destination: '87654321', date: '2025-05-03' },
-            { id: '3', amount: 300, destination: '11223344', date: '2025-05-05' },
-          ]}
+          data={clientTransferences}
           keyExtractor={item => item.id}
           renderItem={({ item }) => (
             <View style={styles.transactionItem}>
               <View style={styles.transactionDetails}>
-                <Text style={styles.transactionAccount}>A: {item.destination}</Text>
-                <Text style={styles.transactionDate}>{item.date}</Text>
+                <Text style={styles.transactionAccount}>Destinatario: {item.destination_client_name}</Text>
+                <Text style={styles.transactionDate}>{item.transfer_date.toString().split("T")[0]}</Text>
               </View>
               <Text style={styles.transactionAmount}>- ${item.amount}</Text>
             </View>
