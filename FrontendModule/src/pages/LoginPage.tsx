@@ -9,25 +9,8 @@ import {
   StatusBar 
 } from 'react-native';
 
-var contador = 1;
-
 interface ScreenProps {
   navigation: any;
-}
-
-interface Transfer {
-  id: string;
-  amount: number;
-  destination: string;
-  date: string;
-}
-
-interface User {
-  username: string;
-  password: string;
-  accountNumber: string;
-  balance: number;
-  transfers: Transfer[];
 }
 
 interface CustomButtonProps {
@@ -60,7 +43,6 @@ const LoginScreen = (props: ScreenProps) => {
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
-  const [attemptsLeft, setAttemptsLeft] = useState<number | null>(null);
 
   const handleLogin = async (): Promise<void> => {
     try {
@@ -71,8 +53,17 @@ const LoginScreen = (props: ScreenProps) => {
       });
 
       const data = await response.json();
+      const adminRole = data.role_id === 1 || data.roleId === 1;
+
       if (response.ok) {
-        props.navigation.navigate('Home', { userID: data.userId });
+        if (adminRole){
+          console.log('Navigating to AdminHome with role_id:', data.role_id);
+          props.navigation.navigate('AdminHome', { userId: data.userId})
+        }else{
+          console.log('Navigating to Home with role_id:', data.role_id);
+          props.navigation.navigate('Home', { userId: data.userId });
+        }
+        
       } else {
         if (data.attemptsLeft !== undefined) {
           setAttemptsLeft(data.attemptsLeft);
@@ -124,12 +115,8 @@ const LoginScreen = (props: ScreenProps) => {
         
         <CustomButton title="Iniciar Sesión" onPress={handleLogin} />
         
-        <TouchableOpacity style={styles.forgotPasswordContainer}>
-          <Text style={styles.forgotPasswordText}>¿Olvidaste tu contraseña?</Text>
-        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
 };
-
 export default LoginScreen;
