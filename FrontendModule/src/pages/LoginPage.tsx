@@ -9,45 +9,10 @@ import {
   StatusBar 
 } from 'react-native';
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
 interface ScreenProps {
   navigation: any;
 }
 
-<<<<<<< Updated upstream
-interface Transfer {
-  id: string;
-  amount: number;
-  destination: string;
-  date: string;
-}
-
-interface User {
-  username: string;
-  password: string;
-  accountNumber: string;
-  balance: number;
-  transfers: Transfer[];
-}
-
-const MOCK_USER: User = {
-  username: 'usuario',
-  password: '12345', 
-  accountNumber: '12345678',
-  balance: 5000,
-  transfers: [
-    { id: '1', amount: 200, destination: '87654321', date: '2025-05-01' },
-    { id: '2', amount: 150, destination: '87654321', date: '2025-05-03' },
-    { id: '3', amount: 300, destination: '11223344', date: '2025-05-05' },
-  ]
-};
-
-
-=======
->>>>>>> Stashed changes
 interface CustomButtonProps {
   title: string;
   onPress: () => void;
@@ -79,13 +44,6 @@ const LoginScreen = (props: ScreenProps) => {
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
 
-<<<<<<< Updated upstream
-  const handleLogin = (): void => {
-    if (username === MOCK_USER.username && password === MOCK_USER.password) {
-      props.navigation.navigate('Home');
-    } else {
-      setError('Usuario o contraseña incorrectos');
-=======
   const handleLogin = async (): Promise<void> => {
     try {
       const response = await fetch('http://localhost:5000/api/login', {
@@ -117,7 +75,6 @@ const LoginScreen = (props: ScreenProps) => {
     } catch (err) {
       console.error(err);
       setError('No se pudo conectar con el servidor');
->>>>>>> Stashed changes
     }
   };
 
@@ -162,5 +119,4 @@ const LoginScreen = (props: ScreenProps) => {
     </SafeAreaView>
   );
 };
-
 export default LoginScreen;

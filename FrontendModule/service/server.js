@@ -17,6 +17,22 @@ const pool = new Pool({
   port: 5432,
 });
 
+// Ruta para obtener un cliente por ID
+app.get('/api/clients/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query('SELECT * FROM client WHERE id = $1', [id]);
+    if (result.rows.length > 0) {
+      res.json(result.rows[0]);
+    } else {
+      res.status(404).json({ message: 'Cliente no encontrado' });
+    }
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Error en el servidor');
+  }
+});
+
 // Ruta para obtener clientes
 app.get('/api/clients', async (req, res) => {
   try {
@@ -28,8 +44,73 @@ app.get('/api/clients', async (req, res) => {
   }
 });
 
-<<<<<<< Updated upstream
-=======
+app.get('/api/user/:id/balance', async (req, res) => {
+  try {
+    const result = await pool.query(`SELECT account.balance FROM account JOIN client ON account.client_id = client.id JOIN app_user ON app_user.client_id = client.id WHERE app_user.id = ${req.params.id}`);
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Error en el servidor');
+  }
+});
+
+app.get('/api/user/:id/transferences', async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT
+          transfer.source_client_name,
+          transfer.destination_client_name,
+          transfer.transfer_date,
+          transfer.amount,
+          transfer.concept
+      FROM (
+          SELECT
+              transfer.id,
+              transfer.transfer_date,
+              transfer.amount,
+              transfer.concept,
+              source_account.client_id as source_client_id,
+              source_account.client_name as source_client_name,
+              destination_account.client_id as destination_client_id,
+              destination_account.client_name as destination_client_name
+          FROM transfer
+          JOIN
+          (
+              SELECT
+                  transfer.id as transfer_id,
+                  client.id as client_id,
+                  client.first_name || ' ' || client.last_name as client_name
+              FROM transfer
+              JOIN account
+                  ON transfer.source_account_id = account.id
+              JOIN client
+                  ON account.client_id = client.id
+          ) source_account
+              ON source_account.transfer_id = transfer.id
+          JOIN (
+              SELECT
+                  transfer.id as transfer_id,
+                  client.id as client_id,
+                  client.first_name || ' ' || client.last_name as client_name
+              FROM transfer
+              JOIN account
+                  ON transfer.destination_account_id = account.id
+              JOIN client
+                  ON account.client_id = client.id
+          ) destination_account
+              ON destination_account.transfer_id = transfer.id
+      ) transfer
+      JOIN app_user
+          ON app_user.client_id = transfer.source_client_id OR app_user.client_id = transfer.destination_client_id
+      WHERE app_user.id = ${req.params.id}`
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Error en el servidor');
+  }
+});
+  
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
   try {
@@ -205,7 +286,6 @@ app.put('/api/accounts/:id/unfreeze', async (req, res) => {
   }
 });
 
->>>>>>> Stashed changes
 app.listen(port, () => {
   console.log(`Servidor corriendo en http://localhost:${port}`);
 });
