@@ -110,6 +110,30 @@ app.get('/api/user/:id/transferences', async (req, res) => {
     res.status(500).send('Error en el servidor');
   }
 });
+
+app.post('/api/transfer', async (req, res) => {
+  try {
+    const data = req.body;
+    const sender_result = await pool.query(
+      `UPDATE account
+      SET balance = balance - ${data.amount}
+      WHERE id = ${data.sender_id}`
+    );
+    const reciever_result = await pool.query(
+      `UPDATE account
+      SET balance = balance + ${data.amount}
+      WHERE id = ${data.reciever_id}`
+    );
+    const transfer_result = await pool.query(
+      `INSERT INTO transfer (source_account_id, destination_account_id, transfer_date, amount, concept)
+      VALUES (${data.sender_id}, ${data.reciever_id}, NOW(), ${data.amount}, ${data.concept});`
+    );
+    res.json(transfer_result.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Error en el servidor');
+  }
+});
   
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
