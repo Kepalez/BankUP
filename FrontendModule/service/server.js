@@ -286,6 +286,25 @@ app.put('/api/accounts/:id/unfreeze', async (req, res) => {
   }
 });
 
+app.post('/api/find_account', async (req, res) => {
+  const valid_columns = ["account_number", "clabe"];
+  const data = req.body;
+  if (!valid_columns.includes(data.column)) {
+    res.status(400).json({ error: 'Bad Request' });
+  }
+  try {
+    const result = await pool.query(
+      `SELECT * FROM account
+       WHERE account.${data.column} = ${data.value}`
+    );
+    res.json(result);
+
+  } catch (error) {
+    console.error('Error buscando cuenta:', error);
+    res.status(500).json({ error: 'Error en el servidor' });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Servidor corriendo en http://localhost:${port}`);
 });
