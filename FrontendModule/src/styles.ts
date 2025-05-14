@@ -78,6 +78,15 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: 'center',
   },
+  identificationText:{
+    fontSize: 16,
+    textAlign: 'center'
+  },
+  successText: {
+    color: COLORS.success,
+    marginBottom: 20,
+    textAlign: 'center',
+  },
   
   // Estilos para botones
   button: {

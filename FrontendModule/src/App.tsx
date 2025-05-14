@@ -8,9 +8,9 @@ import AdminPage from './pages/AdminPage';
 
 type RootStackParamList = {
   Login: undefined;
-  Home: {userID: number | null};
+  Home: {userId: number | null};
   AdminHome: undefined;
-  Transfer: undefined;
+  Transfer: {userId:number | null};
 };
 
 const Stack  = createStackNavigator<RootStackParamList>();
@@ -22,9 +22,9 @@ const App: React.FC = () => {
         headerShown: false
       }}>
         <Stack.Screen name="Login" component={LoginPage}/>
-        <Stack.Screen name="Home" component={HomeScreen} initialParams={{userID:null}}/>
+        <Stack.Screen name="Home" component={HomeScreen} initialParams={{userId:null}}/>
         <Stack.Screen name="AdminHome" component={AdminPage}/>
-        <Stack.Screen name="Transfer" component={TransferScreen} />
+        <Stack.Screen name="Transfer" component={TransferScreen} initialParams={{userId:null}} />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -111,27 +111,68 @@ app.get('/api/user/:id/transferences', async (req, res) => {
   }
 });
 
-app.post('/api/transfer', async (req, res) => {
+app.get('/api/accounts/:id', async (req, res)=>{
+  const userId = req.params.id;
+  try{
+    const result = await pool.query(`SELECT * FROM account WHERE client_id = $1;`,[userId]);
+    if(result.rows.length > 0 ){
+      res.json(result.rows[0]);
+    } else{
+      res.status(404).json({ message: 'Cliente no encontrado' });
+    }
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Error en el servidor');
+  }
+});
+
+app.post('/api/find_account', async (req, res) => {
+  const valid_columns = ["account_number", "clabe"];
+  const data = req.body;
+  if (!valid_columns.includes(data.column)) {
+    res.status(400).json({ error: 'Bad Request' });
+  }
+  console.log("Columns: ",data.column);
+  console.log("Value: ", data.value);
   try {
+    const result = await pool.query(
+      `SELECT * FROM account
+       WHERE ${data.column} = '${data.value}'`
+    );
+    res.json(result);
+  } catch (error) {
+    console.error('Error buscando cuenta:', error);
+    res.status(500).json({ error: 'Error en el servidor' });
+  }
+});
+
+app.post('/api/transfer', async (req, res) => {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
     const data = req.body;
-    const sender_result = await pool.query(
+    await client.query(
       `UPDATE account
       SET balance = balance - ${data.amount}
       WHERE id = ${data.sender_id}`
     );
-    const reciever_result = await pool.query(
+    await client.query(
       `UPDATE account
       SET balance = balance + ${data.amount}
       WHERE id = ${data.reciever_id}`
     );
-    const transfer_result = await pool.query(
+    await client.query(
       `INSERT INTO transfer (source_account_id, destination_account_id, transfer_date, amount, concept)
-      VALUES (${data.sender_id}, ${data.reciever_id}, NOW(), ${data.amount}, ${data.concept});`
+      VALUES (${data.sender_id}, ${data.reciever_id}, NOW(), ${data.amount}, '${data.concept}');`
     );
-    res.json(transfer_result.rows);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Error en el servidor');
+    await client.query('COMMIT');
+    res.status(200).json({ message: 'Transacción exitosa' });
+  } catch (error) {
+    await client.query('ROLLBACK');
+    console.error('Error en la transacción:', error.message);
+    res.status(500).json({ message: 'Transacción fallida', error: error.message });
+  }finally {
+    client.release();
   }
 });
   

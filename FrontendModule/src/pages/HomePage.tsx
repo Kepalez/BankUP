@@ -22,7 +22,7 @@ interface Transfer {
 type RootStackParamList = {
   Login: undefined;
   Home: {userId: number | null};
-  Transfer: undefined;
+  Transfer: {userId: number | null};
 };
 
 type Props = StackScreenProps<RootStackParamList, 'Home'>;
@@ -141,7 +141,7 @@ const HomeScreen: React.FC<Props> = ( {route, navigation} ) => {
       <View style={styles.actionsContainer}>
         <CustomButton 
           title="Realizar Transferencia" 
-          onPress={() => navigation.navigate('Transfer')}
+          onPress={() => navigation.navigate('Transfer',{userId : userId})}
         />
       </View>
       
